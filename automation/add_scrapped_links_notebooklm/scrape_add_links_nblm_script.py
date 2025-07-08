@@ -1,4 +1,9 @@
 #!/usr/bin/env python3
+"""
+NotebookLM Automation Script - Enhanced Version
+Scrapes URLs from documentation sites and adds them to NotebookLM notebooks.
+Features robust error handling and UI change resilience.
+"""
 import asyncio
 import argparse
 import os
@@ -19,7 +24,6 @@ async def login(profile_path):
     profile_path = os.path.expanduser(profile_path)
 
     async with async_playwright() as p:
-        # This is where your cookies and login sessions will be stored
         browser = await p.chromium.launch_persistent_context(
             user_data_dir=profile_path,
             headless=False,
@@ -36,7 +40,7 @@ async def login(profile_path):
 
 async def add_links(notebook_url, links, profile_path):
     """
-    Add links as sources to a NotebookLM notebook.
+    Add links as sources to a NotebookLM notebook with enhanced error handling.
 
     Args:
         notebook_url (str): URL of the NotebookLM notebook
@@ -46,91 +50,191 @@ async def add_links(notebook_url, links, profile_path):
     profile_path = os.path.expanduser(profile_path)
 
     async with async_playwright() as p:
-        # This is where your cookies and login sessions will be stored
         browser = await p.chromium.launch_persistent_context(
             user_data_dir=profile_path,
-            headless=False,  # Set to True if you want to run in the background
+            headless=False,
         )
         page = await browser.new_page()
         await page.goto(notebook_url)
+        
+        print(f"📖 Navigated to notebook")
+        await page.wait_for_timeout(3000)  # Wait for page to load
 
-        for link in links:
-            # Wait for the page to load and dismiss any overlay dialogs
+        successful_links = []
+        failed_links = []
+
+        for i, link in enumerate(links):
+            print(f"🔗 Processing {i+1}/{len(links)}: {link[:60]}...")
+            
             try:
-                # Check if there's an overlay dialog and dismiss it
-                overlay_backdrop = page.locator(".cdk-overlay-backdrop")
-                if await overlay_backdrop.count() > 0:
-                    await overlay_backdrop.click()
-                    await page.wait_for_timeout(1000)  # Wait for dialog to close
-            except:
-                pass  # Continue if no overlay found
-            
-            # Wait for the page to load and the "Add source" button to be visible
-            # Using text content as a locator can be robust to some UI changes
-            add_button = page.locator("text='Add'")
-            await add_button.wait_for(state="visible")
-            
-            # Wait for any overlays to disappear and button to be clickable
-            await page.wait_for_timeout(1000)
-            
-            # Click the "Add source" button with force if needed
-            await add_button.click(force=True)
-
-            # Wait for the source options to appear and click "Webpage" or "Youtube"
-            # Again, using text content
-            if "youtube.com" in link:
-                text_to_click = "YouTube"
-            else:
-                text_to_click = "Website"
-            await page.locator(f"text='{text_to_click}'").wait_for(state="visible")
-            await page.locator(f"text='{text_to_click}'").click()
-
-            # Selector for the modal container based on the provided HTML
-            modal_selector = ".mat-mdc-dialog-inner-container"
-
-            # Wait for the modal container to be visible
-            await page.locator(modal_selector).wait_for(state="visible", timeout=15000)
-
-            # Now, locate the input field within this modal by finding the label
-            # and navigating to the associated input within its form field container.
-            # This chain finds the modal, then the mat-label with specific text,
-            # goes up to its ancestor mat-form-field, and finds the input inside.
-            if "youtube.com" in link:
-                text_to_fill = "Paste YouTube URL"
-            else:
-                text_to_fill = "Paste URL"
-            url_input_locator = (
-                page.locator(modal_selector)
-                .locator(f"mat-label:text('{text_to_fill}')")
-                .locator("xpath=ancestor::mat-form-field")
-                .locator("input")
-            )
-
-            # Fill the input field. Playwright's fill() waits for the element to be actionable.
-            # Use a robust timeout for the fill action itself
-            await url_input_locator.fill(link, timeout=20000)
-
-            # Locate the "Insert" button *within* the modal
-            # We find the button that contains the text "Insert"
-            insert_button_selector = f"{modal_selector} button:has-text('Insert')"
-
-            # Click the "Insert" button.
-            # Playwright's click() waits for the element to be actionable (including enabled).
-            await page.locator(insert_button_selector).click(timeout=20000)
-
-            print(f"Added source: {link}")
-
-            # Wait for the source to be processed
-            await page.wait_for_timeout(2000)  # Wait for 2 seconds
+                # Step 1: Dismiss any overlay dialogs
+                try:
+                    overlay_backdrop = page.locator(".cdk-overlay-backdrop")
+                    if await overlay_backdrop.count() > 0:
+                        await overlay_backdrop.click()
+                        await page.wait_for_timeout(1000)
+                except:
+                    pass
+                
+                # Step 2: Find and click the Add button with multiple fallbacks
+                add_selectors = [
+                    "text='Add'",
+                    "button:has-text('Add')",
+                    "[data-testid*='add']",
+                    "button[aria-label*='Add']",
+                    ".add-button",
+                    "button:has-text('+ Add')"
+                ]
+                
+                add_button = None
+                for selector in add_selectors:
+                    try:
+                        add_button = page.locator(selector).first
+                        if await add_button.count() > 0:
+                            break
+                    except:
+                        continue
+                
+                if not add_button or await add_button.count() == 0:
+                    print(f"   ❌ Could not find Add button")
+                    failed_links.append(link)
+                    continue
+                
+                await add_button.wait_for(state="visible", timeout=10000)
+                await add_button.click()
+                
+                # Step 3: Find and click the appropriate source type
+                await page.wait_for_timeout(2000)  # Wait for dialog to appear
+                
+                # Determine source type options to look for
+                if "youtube.com" in link:
+                    target_options = ["YouTube", "Youtube", "YouTube video", "Video"]
+                else:
+                    target_options = ["Website", "Web page", "Webpage", "Web", "URL", "Link"]
+                
+                source_button = None
+                for option in target_options:
+                    try:
+                        button = page.locator(f"text='{option}'").first
+                        if await button.count() > 0:
+                            source_button = button
+                            break
+                    except:
+                        continue
+                
+                if not source_button:
+                    print(f"   ❌ Could not find source type option")
+                    failed_links.append(link)
+                    # Try to close dialog
+                    try:
+                        await page.keyboard.press("Escape")
+                        await page.wait_for_timeout(1000)
+                    except:
+                        pass
+                    continue
+                
+                await source_button.click()
+                
+                # Step 4: Find and fill the URL input with multiple fallbacks
+                await page.wait_for_timeout(2000)
+                
+                input_selectors = [
+                    "input[placeholder*='URL']",
+                    "input[placeholder*='url']",
+                    "input[placeholder*='link']",
+                    "input[placeholder*='YouTube']",
+                    "input[type='url']",
+                    "input[type='text']",
+                    ".mat-mdc-input-element",
+                    "textarea"
+                ]
+                
+                url_input = None
+                for selector in input_selectors:
+                    try:
+                        input_elem = page.locator(selector).first
+                        if await input_elem.count() > 0:
+                            url_input = input_elem
+                            break
+                    except:
+                        continue
+                
+                if not url_input:
+                    print(f"   ❌ Could not find URL input field")
+                    failed_links.append(link)
+                    continue
+                
+                # Clear and fill the input
+                await url_input.click()
+                await url_input.fill("")  # Clear first
+                await url_input.fill(link)
+                
+                # Step 5: Find and click submit button with multiple fallbacks
+                await page.wait_for_timeout(1000)
+                
+                submit_selectors = [
+                    "button:has-text('Insert')",
+                    "button:has-text('Add')",
+                    "button:has-text('Submit')",
+                    "button:has-text('Save')",
+                    "button[type='submit']",
+                    ".mat-primary",
+                    "button.mdc-button--raised"
+                ]
+                
+                submit_button = None
+                for selector in submit_selectors:
+                    try:
+                        btn = page.locator(selector).first
+                        if await btn.count() > 0:
+                            submit_button = btn
+                            break
+                    except:
+                        continue
+                
+                if not submit_button:
+                    print(f"   ❌ Could not find submit button")
+                    failed_links.append(link)
+                    continue
+                
+                await submit_button.click()
+                print(f"   ✅ Successfully added")
+                successful_links.append(link)
+                
+                # Wait for processing
+                await page.wait_for_timeout(3000)
+                
+            except Exception as e:
+                print(f"   ❌ Error: {str(e)}")
+                failed_links.append(link)
+                
+                # Try to escape any dialogs and continue
+                try:
+                    await page.keyboard.press("Escape")
+                    await page.wait_for_timeout(1000)
+                except:
+                    pass
+                continue
 
         await browser.close()
+        
+        # Summary
+        print(f"\n📊 Summary:")
+        print(f"✅ Successfully added: {len(successful_links)}")
+        print(f"❌ Failed to add: {len(failed_links)}")
+        
+        if failed_links:
+            print(f"\n❌ Failed links:")
+            for link in failed_links:
+                print(f"   - {link}")
 
 
 def read_links_from_file(file_path):
+    """Read links from a file, one link per line."""
     with open(file_path, "r") as f:
         return [line.strip() for line in f if line.strip()]
 
-# New extraction function (standalone operation)
+
 def extract_toc_links(base_url, versions=None, output_file="urls.txt"):
     """
     Extract documentation links from a base URL with optional version support
@@ -206,9 +310,10 @@ def extract_toc_links(base_url, versions=None, output_file="urls.txt"):
         print("❌ No valid links extracted")
         return False
 
+
 def main():
     parser = argparse.ArgumentParser(
-        description="NotebookLM Automation Tool",
+        description="NotebookLM Automation Tool - Enhanced Version",
         formatter_class=argparse.RawTextHelpFormatter
     )
     parser.add_argument("--notebook", help="URL of the NotebookLM notebook")
@@ -301,9 +406,8 @@ def main():
             print("❌ No links found to process")
             sys.exit(1)
             
-        print(f"Adding {len(links)} sources to notebook...")
+        print(f"🚀 Adding {len(links)} sources to notebook...")
         asyncio.run(add_links(args.notebook, links, args.profile_path))
-        print("✅ Sources added successfully")
         sys.exit(0)
 
     # No valid mode selected
@@ -315,4 +419,4 @@ def main():
 
 
 if __name__ == "__main__":
-    main()
+    main() 

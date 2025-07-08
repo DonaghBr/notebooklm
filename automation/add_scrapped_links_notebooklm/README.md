@@ -4,7 +4,7 @@ Automate the process of extracting documentation URLs and adding them as sources
 
 ## 🛠️ Scripts Overview
 
-### `scrap_add_link_nblm_script.py` - Enhanced URL Extraction & Notebook Management
+### `scrape_add_links_nblm_script.py` - Enhanced URL Extraction & Notebook Management
 - **Extract URLs** from documentation sites with version support
 - **Smart file detection** for seamless workflow
 - **Add URLs to NotebookLM** with authentication management
@@ -67,15 +67,15 @@ venv\Scripts\activate     # Windows
 #### Step 1: Extract URLs from Documentation
 ```bash
 # Extract from latest version (default)
-python3 scrap_add_link_nblm_script.py --extract-toc "https://docs.redhat.com/en/documentation/red_hat_openshift_ai_self-managed" --toc-output my_links.txt
+python3 scrape_add_links_nblm_script.py --extract-toc "https://docs.redhat.com/en/documentation/red_hat_openshift_ai_self-managed" --toc-output my_links.txt
 
 # Or specify versions
-python3 scrap_add_link_nblm_script.py --extract-toc "https://docs.redhat.com/en/documentation/red_hat_openshift_ai_self-managed" --versions "latest,2.21,2.20" --toc-output my_links.txt
+python3 scrape_add_links_nblm_script.py --extract-toc "https://docs.redhat.com/en/documentation/red_hat_openshift_ai_self-managed" --versions "latest,2.21,2.20" --toc-output my_links.txt
 ```
 
 #### Step 2: Authenticate with Google (First time only)
 ```bash
-python3 scrap_add_link_nblm_script.py --login
+python3 scrape_add_links_nblm_script.py --login
 ```
 - Opens browser window
 - Log in to Google manually
@@ -88,7 +88,7 @@ python3 scrap_add_link_nblm_script.py --login
 
 #### Step 4: Add URLs to Notebook
 ```bash
-python3 scrap_add_link_nblm_script.py --notebook "https://notebooklm.google.com/notebook/YOUR_NOTEBOOK_ID"
+python3 scrape_add_links_nblm_script.py --notebook "https://notebooklm.google.com/notebook/YOUR_NOTEBOOK_ID"
 ```
 **Note**: No need to specify `--links-file` - it automatically detects your extracted URLs!
 
@@ -98,35 +98,35 @@ python3 scrap_add_link_nblm_script.py --notebook "https://notebooklm.google.com/
 
 #### Extract with Default Version (latest)
 ```bash
-python3 scrap_add_link_nblm_script.py --extract-toc "BASE_URL" --toc-output output.txt
+python3 scrape_add_links_nblm_script.py --extract-toc "BASE_URL" --toc-output output.txt
 ```
 
 #### Extract with Specific Versions
 ```bash
-python3 scrap_add_link_nblm_script.py --extract-toc "BASE_URL" --versions "2.21,2.22,latest" --toc-output output.txt
+python3 scrape_add_links_nblm_script.py --extract-toc "BASE_URL" --versions "2.21,2.22,latest" --toc-output output.txt
 ```
 
 ### Notebook Management Mode
 
 #### Auto-detect Links File
 ```bash
-python3 scrap_add_link_nblm_script.py --notebook "NOTEBOOK_URL"
+python3 scrape_add_links_nblm_script.py --notebook "NOTEBOOK_URL"
 ```
 Automatically searches for: `urls.txt`, `my_links.txt`, `urls_clean.txt`
 
 #### Specify Links File
 ```bash
-python3 scrap_add_link_nblm_script.py --notebook "NOTEBOOK_URL" --links-file custom_links.txt
+python3 scrape_add_links_nblm_script.py --notebook "NOTEBOOK_URL" --links-file custom_links.txt
 ```
 
 #### Add Individual URLs
 ```bash
-python3 scrap_add_link_nblm_script.py --notebook "NOTEBOOK_URL" --links "https://example.com" "https://youtube.com/watch?v=xyz"
+python3 scrape_add_links_nblm_script.py --notebook "NOTEBOOK_URL" --links "https://example.com" "https://youtube.com/watch?v=xyz"
 ```
 
 ### Authentication Mode
 ```bash
-python3 scrap_add_link_nblm_script.py --login
+python3 scrape_add_links_nblm_script.py --login
 ```
 
 ## 🔧 Advanced Options
@@ -159,22 +159,22 @@ When `--links-file` is not specified, the script automatically searches for:
 ### Example 1: Red Hat OpenShift AI Documentation
 ```bash
 # Extract latest documentation
-python3 scrap_add_link_nblm_script.py --extract-toc "https://docs.redhat.com/en/documentation/red_hat_openshift_ai_self-managed"
+python3 scrape_add_links_nblm_script.py --extract-toc "https://docs.redhat.com/en/documentation/red_hat_openshift_ai_self-managed"
 
 # Login (first time only)
-python3 scrap_add_link_nblm_script.py --login
+python3 scrape_add_links_nblm_script.py --login
 
 # Add to notebook (auto-detects urls.txt)
-python3 scrap_add_link_nblm_script.py --notebook "https://notebooklm.google.com/notebook/abc123"
+python3 scrape_add_links_nblm_script.py --notebook "https://notebooklm.google.com/notebook/abc123"
 ```
 
 ### Example 2: Multiple Versions
 ```bash
 # Extract from multiple versions
-python3 scrap_add_link_nblm_script.py --extract-toc "https://docs.example.com/product" --versions "v1.0,v2.0,latest" --toc-output multi_version_links.txt
+python3 scrape_add_links_nblm_script.py --extract-toc "https://docs.example.com/product" --versions "v1.0,v2.0,latest" --toc-output multi_version_links.txt
 
 # Add to notebook
-python3 scrap_add_link_nblm_script.py --notebook "https://notebooklm.google.com/notebook/xyz789" --links-file multi_version_links.txt
+python3 scrape_add_links_nblm_script.py --notebook "https://notebooklm.google.com/notebook/xyz789" --links-file multi_version_links.txt
 ```
 
 ### Example 3: Using the Simple Script
@@ -213,7 +213,7 @@ rm -f ~/.browser_automation/SingletonLock ~/.browser_automation/SingletonCookie 
 **Error**: Authentication failures
 **Solution**: Re-run login process:
 ```bash
-python3 scrap_add_link_nblm_script.py --login
+python3 scrape_add_links_nblm_script.py --login
 ```
 
 ### URL Extraction Failures
