@@ -5,15 +5,11 @@ Automate the process of extracting documentation URLs and adding them as sources
 ## 🛠️ Scripts Overview
 
 ### `scrape_add_links_nblm_script.py` - Enhanced URL Extraction & Notebook Management
+- **Based on** This code is adapted from https://github.com/sshnaidm/notebooklm/blob/master/automation/add_links_script.py   
 - **Extract URLs** from documentation sites with version support
 - **Smart file detection** for seamless workflow
 - **Add URLs to NotebookLM** with authentication management
 - **All-in-one solution** for extraction and notebook loading
-
-### `add_links_script.py` - Simple Notebook URL Loader
-- **Basic URL loading** from files or command line
-- **Persistent authentication** with Google/NotebookLM
-- **Focus on notebook management** only
 
 ## ✨ Features
 
