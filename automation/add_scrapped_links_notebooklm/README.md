@@ -75,7 +75,7 @@ python3 scrape_add_links_nblm_script.py --login
 ```
 - Opens browser window
 - Log in to Google manually
-- **🔑 IMPORTANT: Close the browser window after logging in** (saves session)
+- **IMPORTANT: Close the browser window after logging in** (saves session)
 
 #### Step 3: Create NotebookLM Notebook
 1. Go to [NotebookLM](https://notebooklm.google.com/)
@@ -88,7 +88,7 @@ python3 scrape_add_links_nblm_script.py --notebook "https://notebooklm.google.co
 ```
 **Note**: No need to specify `--links-file` - it automatically detects your extracted URLs!
 
-## 📖 Detailed Usage
+## Detailed Usage
 
 ### URL Extraction Mode
 
@@ -125,9 +125,12 @@ python3 scrape_add_links_nblm_script.py --notebook "NOTEBOOK_URL" --links "https
 python3 scrape_add_links_nblm_script.py --login
 ```
 
-## 🔧 Advanced Options
+## Advanced Options
 
 ### All Command Line Options
+
+**Help file**
+- `--help`: Lists all of the options that are available below
 
 **Extraction Mode**:
 - `--extract-toc URL`: Base documentation URL to scrape
@@ -173,7 +176,7 @@ python3 scrape_add_links_nblm_script.py --extract-toc "https://docs.example.com/
 python3 scrape_add_links_nblm_script.py --notebook "https://notebooklm.google.com/notebook/xyz789" --links-file multi_version_links.txt
 ```
 
-## 🛠️ Troubleshooting
+## Troubleshooting
 
 ### Virtual Environment Issues
 **Error**: "ModuleNotFoundError" or missing packages
