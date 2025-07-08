@@ -173,15 +173,6 @@ python3 scrape_add_links_nblm_script.py --extract-toc "https://docs.example.com/
 python3 scrape_add_links_nblm_script.py --notebook "https://notebooklm.google.com/notebook/xyz789" --links-file multi_version_links.txt
 ```
 
-### Example 3: Using the Simple Script
-```bash
-# Login
-python3 add_links_script.py --login
-
-# Add URLs
-python3 add_links_script.py --notebook "https://notebooklm.google.com/notebook/abc123" --links-file urls_clean.txt
-```
-
 ## 🛠️ Troubleshooting
 
 ### Virtual Environment Issues
@@ -242,14 +233,3 @@ python3 scrape_add_links_nblm_script.py --login
 - **Content Types**: Supports both website URLs and YouTube videos
 - **File Format**: All URL files should have one URL per line
 
-## 🎉 Your Red Hat OpenShift AI Documentation
-
-Your setup is perfect for creating a comprehensive NotebookLM assistant with Red Hat OpenShift AI documentation. The extracted URLs cover:
-
-- Installation and configuration
-- Data science workflows
-- Model serving and management
-- Troubleshooting and best practices
-- Tutorials and examples
-
-This creates an AI assistant that can help with OpenShift AI questions across all documentation versions! 
