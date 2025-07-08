@@ -2,7 +2,7 @@
 
 Automate the process of extracting documentation URLs and adding them as sources to NotebookLM notebooks using browser automation.
 
-## 🛠️ Scripts Overview
+## Scripts Overview
 
 ### `scrape_add_links_nblm_script.py` - Enhanced URL Extraction & Notebook Management
 - **Based on** This code is adapted from https://github.com/sshnaidm/notebooklm/blob/master/automation/add_links_script.py   
@@ -11,17 +11,17 @@ Automate the process of extracting documentation URLs and adding them as sources
 - **Add URLs to NotebookLM** with authentication management
 - **All-in-one solution** for extraction and notebook loading
 
-## ✨ Features
+## Features
 
-- ✅ **URL Extraction**: Scrape documentation hierarchies with version support
-- ✅ **Smart File Handling**: Auto-detects available URL files
-- ✅ **Version Support**: Defaults to "latest" or specify custom versions
-- ✅ **Authentication Management**: Persistent Google login sessions
-- ✅ **Bulk URL Loading**: Add multiple URLs to NotebookLM automatically
-- ✅ **Error Handling**: Comprehensive error messages and recovery options
-- ✅ **YouTube & Website Support**: Handles both content types
+- **URL Extraction**: Scrape documentation hierarchies with version support
+- **Smart File Handling**: Auto-detects available URL files
+- **Version Support**: Defaults to "latest" or a version to specificy such as 2.19, 2.20
+- **Authentication Management**: Persistent Google login sessions
+- **Bulk URL Loading**: Add multiple URLs to NotebookLM automatically
+- **Error Handling**: Comprehensive error messages and recovery options
+- **YouTube & Website Support**: Handles both content types
 
-## 🚀 Quick Start
+## Quick Start
 
 ### Prerequisites
 - Python 3.7+
@@ -150,7 +150,7 @@ When `--links-file` is not specified, the script automatically searches for:
 2. `my_links.txt` (common custom name)
 3. `urls_clean.txt` (your clean file)
 
-## 🎯 Usage Examples
+## Usage Examples
 
 ### Example 1: Red Hat OpenShift AI Documentation
 ```bash
@@ -217,13 +217,13 @@ python3 scrape_add_links_nblm_script.py --login
 - Ensure you closed the browser window after logging in
 - Try running the login step again
 
-## 📁 Generated Files
+## Generated Files
 
 - `urls.txt`: Default extraction output
 - `my_links.txt`: Common custom extraction output
 - `urls_clean.txt`: Your cleaned URL file (from RTF conversion)
 
-## 📝 Notes
+## Notes
 
 - **Virtual Environment**: Always activate your virtual environment (`source venv/bin/activate`) before running scripts
 - **Dependencies**: All required packages are listed in `requirements.txt` for easy installation
