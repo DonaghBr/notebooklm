@@ -1,0 +1,11 @@
+# NotebookLM Automation Tools - Dependencies
+# Install with: python3 -m pip install -r requirements.txt
+
+# Browser automation for NotebookLM interaction
+playwright>=1.53.0
+
+# HTTP requests for web scraping
+requests>=2.31.0
+
+# HTML parsing for URL extraction
+beautifulsoup4>=4.12.0 
