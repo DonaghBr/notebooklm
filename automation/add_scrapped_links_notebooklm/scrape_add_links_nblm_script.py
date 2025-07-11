@@ -283,6 +283,10 @@ def extract_toc_links(base_url, versions=None, output_file="urls.txt"):
                     
                 # Convert to absolute URL
                 absolute_url = urljoin(version_url, href)
+
+                # Transform /html/ to /html-single/ in the URL
+                if '/html/' in absolute_url:
+                    absolute_url = absolute_url.replace('/html/', '/html-single/')
                 
                 # Filter for URLs containing the specific base path
                 if base_url in absolute_url:
