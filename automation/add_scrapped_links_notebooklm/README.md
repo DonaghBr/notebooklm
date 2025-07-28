@@ -36,7 +36,7 @@ Automate the process of extracting documentation URLs and adding them as sources
 From the script directory, navigate to where the virtual environment is located:
 ```bash
 # Navigate to project root (where .venv is located)
-cd /Users/dobrenna/Documents/NLP_college/sandbox/add_links_notebook
+cd ../add_links_notebook
 ```
 
 #### Step 2: Activate Virtual Environment
@@ -59,10 +59,10 @@ python3 -m playwright install
 
 #### Step 3: Install Playwright Browser
 ```bash
-# Verify Playwright is installed
+# Check Playwright is installed
 playwright --version
 
-# Install Chromium browser for automation
+# Install Chromium browser for automation - needed for authentication
 playwright install chromium
 ```
 
@@ -74,7 +74,7 @@ cd notebooklm/automation/add_scrapped_links_notebooklm
 
 **Note**: Always ensure the virtual environment is active (you should see `(.venv)` in your terminal prompt) before running the scripts.
 
-### Complete Workflow (Recommended)
+### Complete Workflow
 
 #### Option 1: Full Combined Workflow (One Command)
 ```bash
