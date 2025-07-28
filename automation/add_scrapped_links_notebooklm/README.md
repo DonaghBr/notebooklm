@@ -42,7 +42,7 @@ cd ../add_links_notebook
 #### Step 2: Activate Virtual Environment
 Create a virtual environment
 ```bash
-# Activate the existing virtual environment
+# If using this for the first time, create a new virtual environment
 python -m venv
 ```
 
@@ -51,11 +51,14 @@ python -m venv
 source .venv/bin/activate
 ```
 # Install dependencies
+```bash
 python3 -m pip install -r requirements.txt
+```
 
-# Install browser binaries for Playwright
+# Install browser binaries for Playwright - assuming you haven't installed it by running requirements.txt 
+```bash
 python3 -m playwright install
-
+```
 
 #### Step 3: Install Playwright Browser
 ```bash
@@ -69,7 +72,7 @@ playwright install chromium
 #### Step 4: Return to Script Directory
 ```bash
 # Navigate back to script directory
-cd notebooklm/automation/add_scrapped_links_notebooklm
+cd ../add_scrapped_links_notebooklm
 ```
 
 **Note**: Always ensure the virtual environment is active (you should see `(.venv)` in your terminal prompt) before running the scripts.
