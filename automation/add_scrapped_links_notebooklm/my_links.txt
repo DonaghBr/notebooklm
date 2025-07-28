@@ -1,8 +1,0 @@
-https://docs.redhat.com/en/documentation/red_hat_ai_inference_server/
-https://docs.redhat.com/en/documentation/red_hat_ai_inference_server/3.1/html/getting_started
-https://docs.redhat.com/en/documentation/red_hat_ai_inference_server/3.1/html/installing_red_hat_ai_inference_server_in_a_disconnected_environment
-https://docs.redhat.com/en/documentation/red_hat_ai_inference_server/3.1/html/llm_compressor
-https://docs.redhat.com/en/documentation/red_hat_ai_inference_server/3.1/html/release_notes
-https://docs.redhat.com/en/documentation/red_hat_ai_inference_server/3.1/html/supported_product_and_hardware_configurations
-https://docs.redhat.com/en/documentation/red_hat_ai_inference_server/3.1/html/validated_models
-https://docs.redhat.com/en/documentation/red_hat_ai_inference_server/3.1/html/vllm_server_arguments

@@ -1,0 +1,21 @@
+﻿https://docs.asciidoctor.org/asciidoc/latest/blocks/admonitions/#ex-block 
+https://redhat-documentation.github.io/modular-docs/#assembly-guidelines 
+https://github.com/redhat-documentation/modular-docs/blob/main/modular-docs-manual/files/TEMPLATE_ASSEMBLY_a-collection-of-modules.adoc 
+https://www.redhat.com/en/about/brand/standards/handbooks/product-branding-handbook 
+Copy and paste the content of your repository's attributes file directly into a source. For OCP that’s attributes/common-attributes.adoc
+ https://github.com/redhat-documentation/modular-docs/blob/main/modular-docs-manual/files/TEMPLATE_CONCEPT_concept-explanation.adoc 
+https://github.com/openshift/openshift-docs/blob/main/contributing_to_docs/doc_guidelines.adoc#using-conscious-language 
+https://access.redhat.com/support/offerings/devpreview 
+​​https://docs.google.com/document/d/1qic_fLU6w9J9sSfV-g4bqnXoqNnyHQS0fEeiwtIZASw/edit?tab=t.0 
+NotebookLM cannot read this site. Export as a PDF and upload as a source:
+    
+Upload your copy of the IBM Style Guide
+https://redhat-documentation.github.io/supplementary-style-guide/#minimalism 
+https://redhat-documentation.github.io/modular-docs/ 
+https://redhat-documentation.github.io/modular-docs/#con-creating-procedure-modules_writing-mod-docs 
+https://github.com/redhat-documentation/modular-docs/blob/main/modular-docs-manual/files/TEMPLATE_PROCEDURE_doing-one-procedure.adoc 
+https://github.com/redhat-documentation/modular-docs/blob/main/modular-docs-manual/files/TEMPLATE_REFERENCE_reference-material.adoc 
+https://redhat-documentation.github.io/supplementary-style-guide/#shortdesc 
+*Add as a PDF
+ https://access.redhat.com/support/offerings/techpreview 
+ NotebookLM cannot read this site. Export as a PDF and upload as a source:

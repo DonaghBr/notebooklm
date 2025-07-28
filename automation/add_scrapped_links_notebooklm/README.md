@@ -7,15 +7,18 @@ Automate the process of extracting documentation URLs and adding them as sources
 ### `scrape_add_links_nblm_script.py` - Enhanced URL Extraction & Notebook Management
 - **Based on** This code is adapted from https://github.com/sshnaidm/notebooklm/blob/master/automation/add_links_script.py   
 - **Extract URLs** from documentation sites with version support
-- **Smart file detection** for seamless workflow
+- **Combined workflows** - run extraction, authentication, and notebook loading in one command
+- **Smart resource combination** - automatically combines scraped URLs with static CQA resources
 - **Add URLs to NotebookLM** with authentication management
 - **All-in-one solution** for extraction and notebook loading
 
 ## Features
 
 - **URL Extraction**: Scrape documentation hierarchies with version support
-- **Smart File Handling**: Auto-detects available URL files
-- **Version Support**: Defaults to "latest" or a version to specificy such as 2.19, 2.20
+- **Combined Workflows**: Run extract → login → add in single command
+- **Static Resource Integration**: Automatically includes `CQA_res.txt` static links
+- **Consistent File Handling**: Always uses `urls.txt` for predictable behavior
+- **Version Support**: Defaults to "latest" or specify versions like 2.19, 2.20
 - **Authentication Management**: Persistent Google login sessions
 - **Bulk URL Loading**: Add multiple URLs to NotebookLM automatically
 - **Error Handling**: Comprehensive error messages and recovery options
@@ -29,47 +32,68 @@ Automate the process of extracting documentation URLs and adding them as sources
 
 ### Installation
 
-#### Step 1: Create Virtual Environment
+#### Step 1: Navigate to Project Root
+From the script directory, navigate to where the virtual environment is located:
 ```bash
-# Create a virtual environment
-python3 -m venv venv
-
-# Activate the virtual environment
-# On macOS/Linux:
-source venv/bin/activate
-
-# On Windows:
-# venv\Scripts\activate
+# Navigate to project root (where .venv is located)
+cd /Users/dobrenna/Documents/NLP_college/sandbox/add_links_notebook
 ```
 
-#### Step 2: Install Dependencies
+#### Step 2: Activate Virtual Environment
+Create a virtual environment
 ```bash
+# Activate the existing virtual environment
+python -m venv
+```
+
+```bash
+# Activate the existing virtual environment
+source .venv/bin/activate
+```
 # Install dependencies
 python3 -m pip install -r requirements.txt
 
 # Install browser binaries for Playwright
 python3 -m playwright install
+
+
+#### Step 3: Install Playwright Browser
+```bash
+# Verify Playwright is installed
+playwright --version
+
+# Install Chromium browser for automation
+playwright install chromium
 ```
 
-**Note**: Always activate your virtual environment before running the scripts:
+#### Step 4: Return to Script Directory
 ```bash
-source venv/bin/activate  # macOS/Linux
-# or
-venv\Scripts\activate     # Windows
+# Navigate back to script directory
+cd notebooklm/automation/add_scrapped_links_notebooklm
 ```
+
+**Note**: Always ensure the virtual environment is active (you should see `(.venv)` in your terminal prompt) before running the scripts.
 
 ### Complete Workflow (Recommended)
 
-#### Step 1: Extract URLs from Documentation
+#### Option 1: Full Combined Workflow (One Command)
 ```bash
-# Extract from latest version (default)
-python3 scrape_add_links_nblm_script.py --extract-toc "https://docs.redhat.com/en/documentation/red_hat_openshift_ai_self-managed" --toc-output my_links.txt
-
-# Or specify versions
-python3 scrape_add_links_nblm_script.py --extract-toc "https://docs.redhat.com/en/documentation/red_hat_openshift_ai_self-managed" --versions "latest,2.21,2.20" --toc-output my_links.txt
+# Extract URLs, authenticate, and add to notebook in one command
+python3 scrape_add_links_nblm_script.py --extract-toc "https://docs.redhat.com/en/documentation/red_hat_openshift_ai_self-managed" --login --notebook "https://notebooklm.google.com/notebook/YOUR_NOTEBOOK_ID"
 ```
 
-#### Step 2: Authenticate with Google (First time only)
+#### Option 2: Step-by-Step Workflow
+
+**Step 1: Extract URLs from Documentation**
+```bash
+# Extract from latest version (saves to urls.txt)
+python3 scrape_add_links_nblm_script.py --extract-toc "https://docs.redhat.com/en/documentation/red_hat_openshift_ai_self-managed"
+
+# Or specify versions
+python3 scrape_add_links_nblm_script.py --extract-toc "https://docs.redhat.com/en/documentation/red_hat_openshift_ai_self-managed" --versions "latest,2.21,2.20"
+```
+
+**Step 2: Authenticate with Google (First time only)**
 ```bash
 python3 scrape_add_links_nblm_script.py --login
 ```
@@ -77,47 +101,48 @@ python3 scrape_add_links_nblm_script.py --login
 - Log in to Google manually
 - **IMPORTANT: Close the browser window after logging in** (saves session)
 
-#### Step 3: Create NotebookLM Notebook
+**Step 3: Create NotebookLM Notebook**
 1. Go to [NotebookLM](https://notebooklm.google.com/)
 2. Create a new notebook
 3. Copy the notebook URL
 
-#### Step 4: Add URLs to Notebook
+**Step 4: Add URLs to Notebook**
 ```bash
 python3 scrape_add_links_nblm_script.py --notebook "https://notebooklm.google.com/notebook/YOUR_NOTEBOOK_ID"
 ```
-**Note**: No need to specify `--links-file` - it automatically detects your extracted URLs!
+**Note**: Automatically combines `urls.txt` (scraped URLs) + `CQA_res.txt` (static resources)
 
 ## Detailed Usage
+
+### Combined Workflow Examples
+
+```bash
+# Full workflow (extract → login → add):
+python3 scrape_add_links_nblm_script.py --extract-toc URL --login --notebook NOTEBOOK_URL
+
+# Extract then add (uses urls.txt automatically):
+python3 scrape_add_links_nblm_script.py --extract-toc URL --notebook NOTEBOOK_URL
+
+# Login then add (uses existing urls.txt):
+python3 scrape_add_links_nblm_script.py --login --notebook NOTEBOOK_URL
+```
 
 ### URL Extraction Mode
 
 #### Extract with Default Version (latest)
 ```bash
-python3 scrape_add_links_nblm_script.py --extract-toc "BASE_URL" --toc-output output.txt
+python3 scrape_add_links_nblm_script.py --extract-toc "BASE_URL"
 ```
+*Always saves to `urls.txt` unless `--toc-output` specified*
 
 #### Extract with Specific Versions
 ```bash
-python3 scrape_add_links_nblm_script.py --extract-toc "BASE_URL" --versions "2.21,2.22,latest" --toc-output output.txt
+python3 scrape_add_links_nblm_script.py --extract-toc "BASE_URL" --versions "2.21,2.22,latest"
 ```
 
-### Notebook Management Mode
-
-#### Auto-detect Links File
+#### Extract with Custom Output File
 ```bash
-python3 scrape_add_links_nblm_script.py --notebook "NOTEBOOK_URL"
-```
-Automatically searches for: `urls.txt`, `my_links.txt`, `urls_clean.txt`
-
-#### Specify Links File
-```bash
-python3 scrape_add_links_nblm_script.py --notebook "NOTEBOOK_URL" --links-file custom_links.txt
-```
-
-#### Add Individual URLs
-```bash
-python3 scrape_add_links_nblm_script.py --notebook "NOTEBOOK_URL" --links "https://example.com" "https://youtube.com/watch?v=xyz"
+python3 scrape_add_links_nblm_script.py --extract-toc "BASE_URL" --toc-output custom_file.txt
 ```
 
 ### Authentication Mode
@@ -125,12 +150,33 @@ python3 scrape_add_links_nblm_script.py --notebook "NOTEBOOK_URL" --links "https
 python3 scrape_add_links_nblm_script.py --login
 ```
 
+### Notebook Management Mode
+
+#### Use Default Files (Recommended)
+```bash
+python3 scrape_add_links_nblm_script.py --notebook "NOTEBOOK_URL"
+```
+*Automatically combines:*
+- `urls.txt` (scraped URLs)
+- `CQA_res.txt` (static CQA resources)
+
+#### Specify Custom Links File
+```bash
+python3 scrape_add_links_nblm_script.py --notebook "NOTEBOOK_URL" --links-file custom_links.txt
+```
+*Still includes `CQA_res.txt` automatically*
+
+#### Add Individual URLs
+```bash
+python3 scrape_add_links_nblm_script.py --notebook "NOTEBOOK_URL" --links "https://example.com" "https://youtube.com/watch?v=xyz"
+```
+
 ## Advanced Options
 
 ### All Command Line Options
 
 **Help file**
-- `--help`: Lists all of the options that are available below
+- `--help`: Lists all available options
 
 **Extraction Mode**:
 - `--extract-toc URL`: Base documentation URL to scrape
@@ -139,51 +185,81 @@ python3 scrape_add_links_nblm_script.py --login
 
 **Notebook Mode**:
 - `--notebook URL`: NotebookLM notebook URL
-- `--links-file FILE`: Links file (auto-detects if not specified)
+- `--links-file FILE`: Links file (default: urls.txt, always includes CQA_res.txt)
 - `--links URL [URL...]`: Individual URLs to add
 
 **Authentication**:
 - `--login`: Run authentication process
 - `--profile-path PATH`: Browser profile directory (default: ~/.browser_automation)
 
-### Smart File Detection
+**Combined Workflows**:
+You can combine any of the three main operations in a single command:
+- `--extract-toc` + `--notebook`: Extract then add
+- `--login` + `--notebook`: Login then add  
+- `--extract-toc` + `--login` + `--notebook`: Full workflow
 
-When `--links-file` is not specified, the script automatically searches for:
-1. `urls.txt` (default extraction output)
-2. `my_links.txt` (common custom name)
-3. `urls_clean.txt` (your clean file)
+### Consistent File Handling
+
+The script now uses **predictable file handling** for easier workflows:
+
+- **Extraction**: Always saves to `urls.txt` (unless `--toc-output` specified)
+- **Notebook Mode**: Always reads from `urls.txt` (unless `--links-file` specified)
+- **Resource Combination**: Always includes `CQA_res.txt` static resources
+- **No Guessing**: Clear, consistent behavior every time
 
 ## Usage Examples
 
-### Example 1: Red Hat OpenShift AI Documentation
+### Example 1: Red Hat OpenShift AI Documentation (Full Workflow)
 ```bash
-# Extract latest documentation
-python3 scrape_add_links_nblm_script.py --extract-toc "https://docs.redhat.com/en/documentation/red_hat_openshift_ai_self-managed"
-
-# Login (first time only)
-python3 scrape_add_links_nblm_script.py --login
-
-# Add to notebook (auto-detects urls.txt)
-python3 scrape_add_links_nblm_script.py --notebook "https://notebooklm.google.com/notebook/abc123"
+# One command to do everything
+python3 scrape_add_links_nblm_script.py \
+  --extract-toc "https://docs.redhat.com/en/documentation/red_hat_openshift_ai_self-managed" \
+  --login \
+  --notebook "https://notebooklm.google.com/notebook/abc123"
 ```
 
-### Example 2: Multiple Versions
+### Example 2: Extract Different Documentation, Reuse Login
+```bash
+# Extract AI Inference Server docs (overwrites urls.txt)
+python3 scrape_add_links_nblm_script.py \
+  --extract-toc "https://docs.redhat.com/en/documentation/red_hat_ai_inference_server" \
+  --notebook "https://notebooklm.google.com/notebook/abc123"
+```
+
+### Example 3: Multiple Versions
 ```bash
 # Extract from multiple versions
-python3 scrape_add_links_nblm_script.py --extract-toc "https://docs.example.com/product" --versions "v1.0,v2.0,latest" --toc-output multi_version_links.txt
-
-# Add to notebook
-python3 scrape_add_links_nblm_script.py --notebook "https://notebooklm.google.com/notebook/xyz789" --links-file multi_version_links.txt
+python3 scrape_add_links_nblm_script.py \
+  --extract-toc "https://docs.example.com/product" \
+  --versions "v1.0,v2.0,latest" \
+  --notebook "https://notebooklm.google.com/notebook/xyz789"
 ```
 
 ## Troubleshooting
 
+### Playwright Browser Installation Issues
+**Error**: "Executable doesn't exist at .../Chromium.app/Contents/MacOS/Chromium"
+**Solution**: Install Playwright browsers:
+```bash
+# Navigate to project root
+cd /Users/dobrenna/Documents/NLP_college/sandbox/add_links_notebook
+
+# Activate virtual environment
+source .venv/bin/activate
+
+# Install Chromium browser
+playwright install chromium
+
+# Return to script directory
+cd notebooklm/automation/add_scrapped_links_notebooklm
+```
+
 ### Virtual Environment Issues
 **Error**: "ModuleNotFoundError" or missing packages
 **Solutions**:
-1. Ensure virtual environment is activated: `source venv/bin/activate`
-2. Install dependencies: `python3 -m pip install -r requirements.txt`
-3. Install browser binaries: `python3 -m playwright install`
+1. Ensure virtual environment is activated: `source .venv/bin/activate`
+2. Check you're in the right directory: should see `(.venv)` in prompt
+3. Verify Playwright installation: `playwright --version`
 
 ### Browser Lock Issues
 **Error**: "ProcessSingleton" errors
@@ -193,14 +269,14 @@ rm -f ~/.browser_automation/SingletonLock ~/.browser_automation/SingletonCookie 
 ```
 
 ### No Links File Found
-**Error**: "No links file found!"
+**Error**: "Main links file not found - urls.txt"
 **Solutions**:
-1. Run `--extract-toc` first to create a links file
+1. Run `--extract-toc` first to create `urls.txt`
 2. Specify `--links-file` with an existing file
 3. Provide `--links` with individual URLs
 
 ### Login Required Errors
-**Error**: Authentication failures
+**Error**: "Could not find Add button" (all links fail)
 **Solution**: Re-run login process:
 ```bash
 python3 scrape_add_links_nblm_script.py --login
@@ -222,17 +298,20 @@ python3 scrape_add_links_nblm_script.py --login
 
 ## Generated Files
 
-- `urls.txt`: Default extraction output
-- `my_links.txt`: Common custom extraction output
-- `urls_clean.txt`: Your cleaned URL file (from RTF conversion)
+- **`urls.txt`**: Primary file for scraped URLs (gets overwritten with each extraction)
+- **`CQA_res.txt`**: Static CQA resources (always included automatically)
+- **Combined**: Script automatically merges both files when adding to notebook
 
 ## Notes
 
-- **Virtual Environment**: Always activate your virtual environment (`source venv/bin/activate`) before running scripts
-- **Dependencies**: All required packages are listed in `requirements.txt` for easy installation
+- **Virtual Environment**: Always activate your virtual environment (`source .venv/bin/activate`) before running scripts
+- **Browser Installation**: One-time setup with `playwright install chromium`
 - **Authentication**: Login session is saved in `~/.browser_automation` directory
-- **Rate Limiting**: Script waits 2 seconds between URLs to avoid overwhelming NotebookLM
+- **File Consistency**: Always uses `urls.txt` for extracted URLs for predictable behavior
+- **Resource Integration**: Automatically includes static CQA resources from `CQA_res.txt`
+- **Rate Limiting**: Script waits 3 seconds between URLs to avoid overwhelming NotebookLM
 - **Browser**: Uses Chromium in visible mode so you can see progress
 - **Content Types**: Supports both website URLs and YouTube videos
 - **File Format**: All URL files should have one URL per line
+- **Combined Workflows**: Can run extraction, authentication, and notebook addition in single command
 

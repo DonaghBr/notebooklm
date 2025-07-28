@@ -1,0 +1,10 @@
+https://docs.redhat.com/en/documentation/red_hat_enterprise_linux_ai/
+https://docs.redhat.com/en/documentation/red_hat_enterprise_linux_ai/1.5/html-single/building_and_maintaining_your_environment
+https://docs.redhat.com/en/documentation/red_hat_enterprise_linux_ai/1.5/html-single/cli_reference
+https://docs.redhat.com/en/documentation/red_hat_enterprise_linux_ai/1.5/html-single/creating_skills_and_knowledge_yaml_files
+https://docs.redhat.com/en/documentation/red_hat_enterprise_linux_ai/1.5/html-single/generating_a_custom_llm_using_rhel_ai
+https://docs.redhat.com/en/documentation/red_hat_enterprise_linux_ai/1.5/html-single/getting_started
+https://docs.redhat.com/en/documentation/red_hat_enterprise_linux_ai/1.5/html-single/hardware_requirements
+https://docs.redhat.com/en/documentation/red_hat_enterprise_linux_ai/1.5/html-single/installing
+https://docs.redhat.com/en/documentation/red_hat_enterprise_linux_ai/1.5/html-single/release_notes
+https://docs.redhat.com/en/documentation/red_hat_enterprise_linux_ai/1.5/html-single/updating
