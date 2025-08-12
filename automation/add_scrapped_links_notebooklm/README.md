@@ -79,12 +79,12 @@ cd ../add_scrapped_links_notebooklm
 
 ### Complete Workflow
 
-#### Option 1: Full Combined Workflow (One Command)
+**Full Combined Workflow (One Command)**
 ```bash
 # Extract URLs, authenticate, and add to notebook in one command
 python3 scrape_add_links_nblm_script.py --extract-toc "https://docs.redhat.com/en/documentation/red_hat_openshift_ai_self-managed" --login --notebook "https://notebooklm.google.com/notebook/YOUR_NOTEBOOK_ID"
 ```
-#### Option 2: Add links other than docs.redhat.com links (One Command)
+**Add links other than docs.redhat.com links (One Command)**
 
 ##### Extract URLs, authenticate, and add to notebook in one command
 python3 scrape_add_links_nblm_script.py --login --notebook "https://notebooklm.google.com/notebook/YOUR_NOTEBOOK_ID" --links https://www.redhat.com/en/blog/red-hat-ai-inference-server-technical-deep-dive https://www.youtube.com/watch?v=b9BWbr_7xs8
