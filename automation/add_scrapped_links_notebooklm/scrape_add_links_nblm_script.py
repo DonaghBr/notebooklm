@@ -676,7 +676,7 @@ def read_links_from_file(file_path):
         return [line.strip() for line in f if line.strip()]
 
 
-def combine_links_from_files(main_file, static_file="CQA_res.txt"):
+def combine_links_from_files(main_file, static_file="CQA_res.txt", skip_static=False):
     """
     Combine links from main file and static CQA_res.txt file.
     
@@ -698,13 +698,16 @@ def combine_links_from_files(main_file, static_file="CQA_res.txt"):
         print(f"❌ Main links file not found: {main_file}")
         return []
     
-    # Read static file (CQA_res.txt)
-    try:
-        static_links = read_links_from_file(static_file)
-        all_links.extend(static_links)
-        print(f"📄 Loaded {len(static_links)} static links from {static_file}")
-    except FileNotFoundError:
-        print(f"⚠️  Static links file not found: {static_file} (skipping)")
+    # Only try to read static file if not skipping
+    if not skip_static:
+        try:
+            static_links = read_links_from_file(static_file)
+            all_links.extend(static_links)
+            print(f"📄 Loaded {len(static_links)} static links from {static_file}")
+        except FileNotFoundError:
+            print(f"⚠️  Static links file not found: {static_file} (skipping)")
+    else:
+        print(f"⏭️  Skipping static file {static_file} (--skip-cqa flag used)")
     
     # Remove duplicates while preserving order
     unique_links = []
@@ -718,13 +721,43 @@ def combine_links_from_files(main_file, static_file="CQA_res.txt"):
     return unique_links
 
 
-def extract_toc_links(base_url, versions=None, output_file="urls.txt"):
+def detect_version_in_url(url):
     """
-    Extract documentation links from a base URL with optional version support
+    Detect if a URL contains a version pattern and extract it.
     
     Args:
-        base_url (str): Base documentation URL (without version)
-        versions (list): List of versions to process (default: ["latest"])
+        url (str): URL to analyze
+        
+    Returns:
+        tuple: (base_url_without_version, detected_version) or (original_url, None)
+    """
+    import re
+    
+    # Remove trailing slash for consistent processing
+    url = url.rstrip('/')
+    
+    # Pattern to match version at the end of URL
+    # Matches: /latest, /3.2, /v3.2, /2.21.1, etc.
+    version_pattern = r'/(latest|v?\d+\.\d+(?:\.\d+)?)$'
+    
+    match = re.search(version_pattern, url)
+    if match:
+        version = match.group(1)
+        base_url = url[:match.start()]
+        return base_url, version
+    
+    return url, None
+
+
+def extract_toc_links(base_url, versions=None, output_file="urls.txt"):
+    """
+    Extract documentation links from a base URL with smart version detection
+    
+    Args:
+        base_url (str): Documentation URL (with or without version)
+                       If version detected in URL and no versions specified, uses detected version
+                       If version detected in URL and versions specified, uses specified versions
+        versions (list): List of versions to process (default: detected version or "latest")
         output_file (str): Output file path
     """
     headers = {
@@ -732,12 +765,26 @@ def extract_toc_links(base_url, versions=None, output_file="urls.txt"):
         'Accept-Language': 'en-US,en;q=0.9'
     }
     
-    # Default to "latest" if no versions specified
-    if versions is None or len(versions) == 0:
-        versions = ["latest"]
-        print("No versions specified, defaulting to 'latest'")
+    # Check if URL already contains a version
+    clean_base_url, detected_version = detect_version_in_url(base_url)
+    
+    if detected_version:
+        print(f"🔍 Detected version '{detected_version}' in URL")
+        if versions is None or len(versions) == 0:
+            # Use the detected version
+            versions = [detected_version]
+            print(f"Using detected version: {detected_version}")
+        else:
+            # User specified versions, use those instead
+            print(f"Ignoring detected version '{detected_version}', using specified versions: {', '.join(versions)}")
+        base_url = clean_base_url
     else:
-        print(f"Processing specified versions: {', '.join(versions)}")
+        # No version detected in URL
+        if versions is None or len(versions) == 0:
+            versions = ["latest"]
+            print("No versions specified, defaulting to 'latest'")
+        else:
+            print(f"Processing specified versions: {', '.join(versions)}")
     
     # Clean up base URL (remove trailing slash)
     base_url = base_url.rstrip('/')
@@ -833,6 +880,8 @@ def main():
                                 "Will also include CQA_res.txt if available")
     link_group.add_argument("--individual", action="store_true",
                            help="Use individual URL addition instead of bulk (slower, legacy method)")
+    link_group.add_argument("--skip-cqa", action="store_true",
+                       help="Skip including CQA_res.txt when using file-based links")
 
     args = parser.parse_args()
 
@@ -883,8 +932,8 @@ def main():
                 print("  3. Provide --links with individual URLs")
                 sys.exit(1)
             
-            # Combine links from main file + CQA_res.txt
-            links = combine_links_from_files(main_file)
+            # Combine links from main file + CQA_res.txt (unless skipped)
+            links = combine_links_from_files(main_file, skip_static=args.skip_cqa)
         
         if not links:
             print("❌ No links found to process")
@@ -901,6 +950,7 @@ def main():
         print("  --extract-toc URL  : Extract documentation links to urls.txt")
         print("  --login            : Authenticate with Google")
         print("  --notebook URL     : Add links from urls.txt + CQA_res.txt to notebook (bulk mode)")
+        print("  --skip-cqa         : Don't include CQA_res.txt when using file-based links")
         print("\nExamples:")
         print("  # Full workflow (extract → login → add in bulk):")
         print("  python3 script.py --extract-toc URL --login --notebook NOTEBOOK_URL")
@@ -908,6 +958,8 @@ def main():
         print("  python3 script.py --extract-toc URL --notebook NOTEBOOK_URL")
         print("  # Login then add (uses existing urls.txt, bulk mode):")
         print("  python3 script.py --login --notebook NOTEBOOK_URL")
+        print("  # Use only custom file (skip CQA_res.txt):")
+        print("  python3 script.py --notebook NOTEBOOK_URL --links-file custom.txt --skip-cqa")
         print("  # Use individual addition (slower, legacy):")
         print("  python3 script.py --notebook NOTEBOOK_URL --individual")
         sys.exit(1)

@@ -14,11 +14,11 @@ Automate the process of extracting documentation URLs and adding them as sources
 
 ## Features
 
-- **URL Extraction**: Scrape documentation hierarchies with version support
+- **URL Extraction**: Scrape documentation hierarchies with smart version detection and support
 - **Combined Workflows**: Run extract → login → add in single command
-- **Static Resource Integration**: Automatically includes `CQA_res.txt` static links
+- **Static Resource Integration**: Automatically includes `CQA_res.txt` static links (optional with `--skip-cqa`)
 - **Consistent File Handling**: Always uses `urls.txt` for predictable behavior
-- **Version Support**: Defaults to "latest" or specify versions like 2.19, 2.20
+- **Version Support**: Auto-detects versions in URLs or specify versions like 2.19, 2.20 (defaults to "latest")
 - **Authentication Management**: Persistent Google login sessions
 - **Bulk URL Loading**: Add multiple URLs to NotebookLM automatically
 - **Error Handling**: Comprehensive error messages and recovery options
@@ -122,7 +122,7 @@ python3 scrape_add_links_nblm_script.py --login
 ```bash
 python3 scrape_add_links_nblm_script.py --notebook "https://notebooklm.google.com/notebook/YOUR_NOTEBOOK_ID"
 ```
-**Note**: Automatically combines `urls.txt` (scraped URLs) + `CQA_res.txt` (static resources)
+**Note**: Automatically combines `urls.txt` (scraped URLs) + `CQA_res.txt` (static resources). Use `--skip-cqa` to exclude CQA_res.txt.
 
 ## Detailed Usage
 
@@ -152,6 +152,16 @@ python3 scrape_add_links_nblm_script.py --extract-toc "BASE_URL"
 python3 scrape_add_links_nblm_script.py --extract-toc "BASE_URL" --versions "2.21,2.22,latest"
 ```
 
+#### Smart Version Detection (URLs with Versions)
+```bash
+# URL contains version - uses detected version (3.2)
+python3 scrape_add_links_nblm_script.py --extract-toc "https://docs.redhat.com/en/documentation/red_hat_ai_inference_server/3.2"
+
+# URL contains version but override with --versions flag
+python3 scrape_add_links_nblm_script.py --extract-toc "https://docs.redhat.com/en/documentation/red_hat_ai_inference_server/3.2" --versions "latest,2.21"
+```
+*Script automatically detects and strips version from URL, then uses detected version or specified versions*
+
 #### Extract with Custom Output File
 ```bash
 python3 scrape_add_links_nblm_script.py --extract-toc "BASE_URL" --toc-output custom_file.txt
@@ -176,11 +186,23 @@ python3 scrape_add_links_nblm_script.py --notebook "NOTEBOOK_URL"
 ```bash
 python3 scrape_add_links_nblm_script.py --notebook "NOTEBOOK_URL" --links-file custom_links.txt
 ```
-*Still includes `CQA_res.txt` automatically*
+*Still includes `CQA_res.txt` automatically (unless `--skip-cqa` is used)*
 
 #### Add Individual URLs
 ```bash
 python3 scrape_add_links_nblm_script.py --notebook "NOTEBOOK_URL" --links "https://example.com" "https://youtube.com/watch?v=xyz"
+```
+
+#### Skip CQA Resources (Use Only Extracted/Custom Links)
+```bash
+# Use only extracted URLs (skip CQA_res.txt)
+python3 scrape_add_links_nblm_script.py --notebook "NOTEBOOK_URL" --skip-cqa
+
+# Use only custom file (skip CQA_res.txt)
+python3 scrape_add_links_nblm_script.py --notebook "NOTEBOOK_URL" --links-file custom.txt --skip-cqa
+
+# Full workflow with skip CQA
+python3 scrape_add_links_nblm_script.py --extract-toc "BASE_URL" --notebook "NOTEBOOK_URL" --skip-cqa
 ```
 
 ## Advanced Options
@@ -191,14 +213,15 @@ python3 scrape_add_links_nblm_script.py --notebook "NOTEBOOK_URL" --links "https
 - `--help`: Lists all available options
 
 **Extraction Mode**:
-- `--extract-toc URL`: Base documentation URL to scrape
-- `--toc-output FILE`: Output file for extracted links (default: urls.txt)
-- `--versions LIST`: Comma-separated versions (default: latest)
+- `--extract-toc URL`: Documentation URL to scrape (with or without version)
+- `--toc-output FILE`: Output file for extracted links (default: urls.txt)  
+- `--versions LIST`: Comma-separated versions (default: detected version or latest)
 
 **Notebook Mode**:
 - `--notebook URL`: NotebookLM notebook URL
 - `--links-file FILE`: Links file (default: urls.txt, always includes CQA_res.txt)
 - `--links URL [URL...]`: Individual URLs to add
+- `--skip-cqa`: Skip including CQA_res.txt when using file-based links
 
 **Authentication**:
 - `--login`: Run authentication process
@@ -210,13 +233,26 @@ You can combine any of the three main operations in a single command:
 - `--login` + `--notebook`: Login then add  
 - `--extract-toc` + `--login` + `--notebook`: Full workflow
 
+### Smart Version Detection
+
+The script automatically detects version numbers in URLs and handles them intelligently:
+
+| URL Format | `--versions` Flag | Behavior |
+|------------|------------------|----------|
+| `https://docs.example.com/product/3.2` | Not specified | Uses detected version `3.2` |
+| `https://docs.example.com/product/3.2` | `--versions 2.21,latest` | Ignores detected `3.2`, uses specified versions |
+| `https://docs.example.com/product` | Not specified | Uses default `latest` |
+| `https://docs.example.com/product` | `--versions 2.21,latest` | Uses specified versions |
+
+**Supported Version Patterns**: `/latest`, `/3.2`, `/v3.2`, `/2.21.1`
+
 ### Consistent File Handling
 
 The script now uses **predictable file handling** for easier workflows:
 
 - **Extraction**: Always saves to `urls.txt` (unless `--toc-output` specified)
 - **Notebook Mode**: Always reads from `urls.txt` (unless `--links-file` specified)
-- **Resource Combination**: Always includes `CQA_res.txt` static resources
+- **Resource Combination**: Always includes `CQA_res.txt` static resources (unless `--skip-cqa` is used)
 - **No Guessing**: Clear, consistent behavior every time
 
 ## Usage Examples
@@ -245,6 +281,35 @@ python3 scrape_add_links_nblm_script.py \
   --extract-toc "https://docs.example.com/product" \
   --versions "v1.0,v2.0,latest" \
   --notebook "https://notebooklm.google.com/notebook/xyz789"
+```
+
+### Example 4: Smart Version Detection  
+```bash
+# URL with version - automatically uses 3.2 (no --versions needed)
+python3 scrape_add_links_nblm_script.py \
+  --extract-toc "https://docs.redhat.com/en/documentation/red_hat_ai_inference_server/3.2" \
+  --notebook "https://notebooklm.google.com/notebook/abc123"
+
+# URL with version but override to get multiple versions
+python3 scrape_add_links_nblm_script.py \
+  --extract-toc "https://docs.redhat.com/en/documentation/red_hat_ai_inference_server/3.2" \
+  --versions "3.2,3.1,latest" \
+  --notebook "https://notebooklm.google.com/notebook/abc123"
+```
+
+### Example 5: Skip CQA Resources (Use Only Documentation)
+```bash
+# Extract and add only Red Hat AI Inference Server docs (no CQA_res.txt)
+python3 scrape_add_links_nblm_script.py \
+  --extract-toc "https://docs.redhat.com/en/documentation/red_hat_ai_inference_server" \
+  --notebook "https://notebooklm.google.com/notebook/abc123" \
+  --skip-cqa
+
+# Use only custom links file (no CQA_res.txt)
+python3 scrape_add_links_nblm_script.py \
+  --notebook "https://notebooklm.google.com/notebook/abc123" \
+  --links-file my_custom_links.txt \
+  --skip-cqa
 ```
 
 ## Troubleshooting
@@ -320,7 +385,7 @@ python3 scrape_add_links_nblm_script.py --login
 - **Browser Installation**: One-time setup with `playwright install chromium`
 - **Authentication**: Login session is saved in `~/.browser_automation` directory
 - **File Consistency**: Always uses `urls.txt` for extracted URLs for predictable behavior
-- **Resource Integration**: Automatically includes static CQA resources from `CQA_res.txt`
+- **Resource Integration**: Automatically includes static CQA resources from `CQA_res.txt` (use `--skip-cqa` to exclude)
 - **Rate Limiting**: Script waits 3 seconds between URLs to avoid overwhelming NotebookLM
 - **Browser**: Uses Chromium in visible mode so you can see progress
 - **Content Types**: Supports both website URLs and YouTube videos
